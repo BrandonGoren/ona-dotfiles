@@ -76,6 +76,35 @@ cat > ~/.claude/settings.json << 'EOF'
 }
 EOF
 
+# Add MCP servers (project-local to clay-base)
+CLAY_BASE_DIR="${HOME}/repos/clay-base"
+if [ -d "$CLAY_BASE_DIR" ]; then
+  # CircleCI (requires CIRCLECI_TOKEN env var)
+  if [ -n "$CIRCLECI_TOKEN" ]; then
+    claude mcp add circleci-mcp-server \
+      -s local \
+      -d "$CLAY_BASE_DIR" \
+      -e CIRCLECI_TOKEN="$CIRCLECI_TOKEN" \
+      -e CIRCLECI_BASE_URL="https://circleci.com" \
+      -- npx -y @circleci/mcp-server-circleci
+  fi
+
+  # Linear
+  claude mcp add linear-server \
+    -s local \
+    -d "$CLAY_BASE_DIR" \
+    --transport http \
+    --url https://mcp.linear.app/mcp
+
+  # Notion
+  claude mcp add notion \
+    -s local \
+    -d "$CLAY_BASE_DIR" \
+    --transport http \
+    --url https://mcp.notion.com/mcp
+
+fi
+
 # Clay-base project-specific settings (Codespaces only)
 if [ -d /workspaces/clay-base ]; then
   mkdir -p ~/.claude/projects/-workspaces-clay-base
