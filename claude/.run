@@ -1,0 +1,144 @@
+#!/bin/zsh
+
+# Configure Claude Code global settings for Ona environments
+mkdir -p ~/.claude
+
+cat > ~/.claude/settings.json << 'EOF'
+{
+  "includeCoAuthoredBy": false,
+  "model": "opus",
+  "alwaysThinkingEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [{ "type": "command", "command": "printf '\\a'" }]
+      },
+      {
+        "matcher": "idle_prompt",
+        "hooks": [{ "type": "command", "command": "printf '\\a'" }]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(chmod:*)",
+      "Bash(git add:*)",
+      "Bash(git branch:*)",
+      "Bash(git cat-file:*)",
+      "Bash(git checkout:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git commit:*)",
+      "Bash(git diff:*)",
+      "Bash(git fetch:*)",
+      "Bash(git log:*)",
+      "Bash(git mv:*)",
+      "Bash(git pull:*)",
+      "Bash(git push:*)",
+      "Bash(git rebase:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(git reset:*)",
+      "Bash(git rm:*)",
+      "Bash(git show:*)",
+      "Bash(git stash:*)",
+      "Bash(git status:*)",
+      "Bash(git submodule:*)",
+      "Bash(gh:*)",
+      "Bash(gt:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(jq:*)",
+      "Bash(awk:*)",
+      "Bash(cut:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(wc:*)",
+      "Bash(diff:*)",
+      "Bash(xargs:*)",
+      "Bash(tree:*)",
+      "Bash(which:*)",
+      "Bash(test:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(chmod:*)",
+      "WebSearch",
+      "WebFetch"
+    ]
+  }
+}
+EOF
+
+# Clay-base project-specific settings (Codespaces only)
+if [ -d /workspaces/clay-base ]; then
+  mkdir -p ~/.claude/projects/-workspaces-clay-base
+
+  cat > ~/.claude/projects/-workspaces-clay-base/settings.json << 'EOF'
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn install)",
+      "Bash(yarn build)",
+      "Bash(yarn dev:*)",
+      "Bash(yarn test:*)",
+      "Bash(yarn lint)",
+      "Bash(yarn lint:*)",
+      "Bash(yarn tsc:*)",
+      "Bash(yarn format:check:*)",
+      "Bash(yarn code:fix)",
+      "Bash(yarn prettier:*)",
+      "Bash(yarn storybook)",
+      "Bash(yarn vitest run:*)",
+      "Bash(yarn eslint:*)",
+      "Bash(yarn info:*)",
+      "Bash(yarn why:*)",
+      "Bash(yarn constraints:*)",
+      "Bash(yarn dlx:*)",
+      "Bash(yarn exec tsc:*)",
+      "Bash(yarn exec turbo tsc:*)",
+      "Bash(yarn workspace @clay-run/frontend tsc:*)",
+      "Bash(yarn workspace @clay-run/api tsc:*)",
+      "Bash(yarn build-storybook:*)",
+      "Bash(yarn lint:generate-suppressions:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx knip:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(npx vitest run)",
+      "Bash(tsc:*)",
+      "Bash(python3:*)",
+      "Bash(time:*)",
+      "Bash(npm info:*)",
+      "mcp__figma-desktop__get_metadata",
+      "mcp__storybook-mcp__list-all-documentation",
+      "mcp__storybook-mcp__get-documentation",
+      "mcp__linear-server__list_projects",
+      "mcp__linear-server__list_milestones",
+      "mcp__linear-server__list_issues",
+      "mcp__linear-server__create_issue",
+      "mcp__circleci-mcp-server__get_latest_pipeline_status",
+      "mcp__circleci-mcp-server__list_followed_projects",
+      "mcp__circleci-mcp-server__get_build_failure_logs",
+      "Skill(agent-browser)",
+      "WebFetch(domain:graphite.dev)",
+      "WebFetch(domain:graphite.com)"
+    ],
+    "deny": [
+      "Bash(gh pr comment:*)",
+      "Bash(gh pr review:*)",
+      "Bash(gh issue comment:*)"
+    ]
+  }
+}
+EOF
+fi
