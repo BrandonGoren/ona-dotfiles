@@ -1,0 +1,24 @@
+claude/.run
+  0b0ac5ecd0625ab0 10,60-61,66-71,75-102,106-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "971a005b4b4deb6375822c2af4812fccef4241d3",
+  "prompts": {
+    "0b0ac5ecd0625ab0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5257009-f2e2-44cc-b3b6-785aeb306469",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Brandon Goren",
+      "messages": [],
+      "total_additions": 98,
+      "total_deletions": 136,
+      "accepted_lines": 91,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/57bbefc8f67f3968b9a425a0d5c07b512cabfe631c94720709a9476a443f4e45"
+    }
+  }
+}
