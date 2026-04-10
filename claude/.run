@@ -6,22 +6,8 @@ mkdir -p ~/.claude
 cat > ~/.claude/settings.json << 'EOF'
 {
   "includeCoAuthoredBy": false,
-  "model": "opus",
-  "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "permission_prompt",
-        "hooks": [{ "type": "command", "command": "printf '\\a'" }]
-      },
-      {
-        "matcher": "idle_prompt",
-        "hooks": [{ "type": "command", "command": "printf '\\a'" }]
-      }
-    ]
-  },
   "permissions": {
+    "defaultMode": "auto",
     "allow": [
       "Bash(chmod:*)",
       "Bash(git add:*)",
@@ -68,27 +54,65 @@ cat > ~/.claude/settings.json << 'EOF'
       "Bash(rm:*)",
       "Bash(mkdir:*)",
       "Bash(touch:*)",
-      "Bash(chmod:*)",
       "WebSearch",
       "WebFetch"
     ]
-  }
+  },
+  "model": "opus[1m]",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '\\a'"
+          }
+        ]
+      },
+      {
+        "matcher": "idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '\\a'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/brandon.goren/.git-ai/bin/git-ai checkpoint claude --hook-input stdin"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/brandon.goren/.git-ai/bin/git-ai checkpoint claude --hook-input stdin"
+          }
+        ]
+      }
+    ]
+  },
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true
 }
 EOF
 
 # Add MCP servers (project-local to clay-base)
 CLAY_BASE_DIR="${HOME}/repos/clay-base"
 if [ -d "$CLAY_BASE_DIR" ]; then
-  # CircleCI (requires CIRCLECI_TOKEN env var)
-  if [ -n "$CIRCLECI_TOKEN" ]; then
-    claude mcp add circleci-mcp-server \
-      -s local \
-      -d "$CLAY_BASE_DIR" \
-      -e CIRCLECI_TOKEN="$CIRCLECI_TOKEN" \
-      -e CIRCLECI_BASE_URL="https://circleci.com" \
-      -- npx -y @circleci/mcp-server-circleci
-  fi
-
   # Linear
   claude mcp add linear-server \
     -s local \
@@ -102,72 +126,4 @@ if [ -d "$CLAY_BASE_DIR" ]; then
     -d "$CLAY_BASE_DIR" \
     --transport http \
     --url https://mcp.notion.com/mcp
-
-fi
-
-# Clay-base project-specific settings (Codespaces only)
-if [ -d /workspaces/clay-base ]; then
-  mkdir -p ~/.claude/projects/-workspaces-clay-base
-
-  cat > ~/.claude/projects/-workspaces-clay-base/settings.json << 'EOF'
-{
-  "permissions": {
-    "allow": [
-      "Bash(yarn install)",
-      "Bash(yarn build)",
-      "Bash(yarn dev:*)",
-      "Bash(yarn test:*)",
-      "Bash(yarn lint)",
-      "Bash(yarn lint:*)",
-      "Bash(yarn tsc:*)",
-      "Bash(yarn format:check:*)",
-      "Bash(yarn code:fix)",
-      "Bash(yarn prettier:*)",
-      "Bash(yarn storybook)",
-      "Bash(yarn vitest run:*)",
-      "Bash(yarn eslint:*)",
-      "Bash(yarn info:*)",
-      "Bash(yarn why:*)",
-      "Bash(yarn constraints:*)",
-      "Bash(yarn dlx:*)",
-      "Bash(yarn exec tsc:*)",
-      "Bash(yarn exec turbo tsc:*)",
-      "Bash(yarn workspace @clay-run/frontend tsc:*)",
-      "Bash(yarn workspace @clay-run/api tsc:*)",
-      "Bash(yarn build-storybook:*)",
-      "Bash(yarn lint:generate-suppressions:*)",
-      "Bash(npx eslint:*)",
-      "Bash(npx tsc:*)",
-      "Bash(npx tsx:*)",
-      "Bash(npx knip:*)",
-      "Bash(npx tailwindcss:*)",
-      "Bash(npx playwright:*)",
-      "Bash(npx playwright test:*)",
-      "Bash(npx vitest run)",
-      "Bash(tsc:*)",
-      "Bash(python3:*)",
-      "Bash(time:*)",
-      "Bash(npm info:*)",
-      "mcp__figma-desktop__get_metadata",
-      "mcp__storybook-mcp__list-all-documentation",
-      "mcp__storybook-mcp__get-documentation",
-      "mcp__linear-server__list_projects",
-      "mcp__linear-server__list_milestones",
-      "mcp__linear-server__list_issues",
-      "mcp__linear-server__create_issue",
-      "mcp__circleci-mcp-server__get_latest_pipeline_status",
-      "mcp__circleci-mcp-server__list_followed_projects",
-      "mcp__circleci-mcp-server__get_build_failure_logs",
-      "Skill(agent-browser)",
-      "WebFetch(domain:graphite.dev)",
-      "WebFetch(domain:graphite.com)"
-    ],
-    "deny": [
-      "Bash(gh pr comment:*)",
-      "Bash(gh pr review:*)",
-      "Bash(gh issue comment:*)"
-    ]
-  }
-}
-EOF
 fi
